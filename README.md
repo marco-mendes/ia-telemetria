@@ -107,5 +107,43 @@ Os detectores RCF precisam de um período de "aquecimento" (geralmente 50-100 da
 
 ---
 
+## 🧹 Limpeza e Saneamento
+
+Se você precisar resetar o ambiente ou liberar espaço em disco, siga os procedimentos abaixo:
+
+### 1. Parar o ambiente
+```bash
+docker-compose down
+```
+
+### 2. Saneamento Completo (Containers, Imagens e Volumes)
+Para remover tudo, incluindo os dados persistidos no OpenSearch e as imagens compiladas da aplicação demo:
+
+```bash
+# Para os containers e remove volumes (limpa os dados do OpenSearch)
+docker-compose down -v
+
+# Remove a imagem da aplicação demo e imagens órfãs
+docker rmi ia-telemetria-demo-app
+docker image prune -f
+```
+
+### 3. Limpeza de Logs e Cache Local
+```bash
+# Remove arquivos de cache do Python (caso tenha rodado localmente)
+find . -type d -name "__pycache__" -exec rm -rf {} +
+```
+
+### 4. Resetar apenas os dados (sem parar os containers)
+Se você quiser apenas limpar os índices e detectores de ML para começar do zero:
+```bash
+# Atenção: Isso deleta todos os dados coletados!
+curl -X DELETE "http://localhost:9200/otel-*"
+curl -X DELETE "http://localhost:9200/_plugins/_anomaly_detection/detectors/*"
+```
+
+---
+
 ## 🎯 Objetivo da POC
 Demonstrar como o OpenSearch pode ser usado não apenas para logs, mas como uma plataforma completa de monitoramento proativo, capaz de identificar comportamentos anômalos em tempo real sem a necessidade de regras estáticas e complexas.
+
