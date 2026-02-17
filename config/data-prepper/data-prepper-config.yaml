@@ -1,0 +1,13 @@
+ssl: false
+server_port: 4900
+
+# Circuit breaker configuration
+circuit_breakers:
+  heap:
+    usage: 400mb
+    reset: 30s
+    check_interval: 5s
+
+# Metrics configuration
+metric_registries:
+  - Prometheus

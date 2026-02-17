@@ -1,0 +1,66 @@
+# Entry pipeline para receber todos os dados OTLP
+entry-pipeline:
+  source:
+    otel_trace_source:
+      ssl: false
+      port: 21890
+  sink:
+    - pipeline:
+        name: "trace-pipeline"
+    - pipeline:
+        name: "service-map-pipeline"
+
+# Pipeline para processar Traces
+trace-pipeline:
+  source:
+    pipeline:
+      name: "entry-pipeline"
+  processor:
+    - otel_trace_raw:
+  sink:
+    - opensearch:
+        hosts: ["http://opensearch-node:9200"]
+        insecure: true
+        index_type: trace-analytics-raw
+        bulk_size: 4
+
+# Pipeline para Service Map
+service-map-pipeline:
+  source:
+    pipeline:
+      name: "entry-pipeline"
+  processor:
+    - service_map_stateful:
+  sink:
+    - opensearch:
+        hosts: ["http://opensearch-node:9200"]
+        insecure: true
+        index_type: trace-analytics-service-map
+
+# Pipeline para Métricas OTLP
+metrics-pipeline:
+  source:
+    otel_metrics_source:
+      ssl: false
+      port: 21891
+  processor:
+    - otel_metrics:
+  sink:
+    - opensearch:
+        hosts: ["http://opensearch-node:9200"]
+        insecure: true
+        index: otel-metrics-%{yyyy.MM.dd}
+        bulk_size: 4
+
+# Pipeline para Logs OTLP
+logs-pipeline:
+  source:
+    otel_logs_source:
+      ssl: false
+      port: 21892
+  sink:
+    - opensearch:
+        hosts: ["http://opensearch-node:9200"]
+        insecure: true
+        index: otel-logs-%{yyyy.MM.dd}
+        bulk_size: 4

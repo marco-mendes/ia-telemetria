@@ -1,0 +1,6 @@
+server.name: opensearch-dashboards
+server.host: "0.0.0.0"
+
+opensearch.hosts: ["http://opensearch-node:9200"]
+
+# Security disabled
